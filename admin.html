@@ -540,7 +540,12 @@ function buildAdminQR(){
   const el = document.getElementById('adminQR');
   el.innerHTML = '';
   const active = currentLinks.filter(l=>l&&l.active!==false);
-  if(!active.length) return;
+  if(!active.length){
+    el.innerHTML = '<div style="width:220px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg4);border-radius:8px;gap:.5rem">'+
+      '<span style="font-size:2rem">⬡</span>'+
+      '<span style="font-size:.8rem;color:var(--muted);text-align:center;padding:0 1rem">أضف روابط من<br>"إدارة الروابط" أولاً</span></div>';
+    return;
+  }
   const text = '━ '+(currentProfile.name||'')+' ━
 
 '+active.map(l=>(l.icon||'')+' '+l.title+': '+l.url).join('
@@ -560,6 +565,7 @@ function switchTab(btn){
   document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  if(btn.dataset.tab === 'qr') setTimeout(buildAdminQR, 50);
 }
 function toast(msg){
   const bar=document.getElementById('saveBar');
