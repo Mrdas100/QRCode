@@ -4,191 +4,180 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>روابطي</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gold:#C9A84C;--gold-l:#E8C97A;--bg:#0D0D0D;--bg2:#161616;--bg3:#1E1E1E;--bg4:#2A2A2A;--text:#F0EDE6;--muted:#888880;--border:rgba(201,168,76,0.18)}
 body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1rem 5rem}
-body::before{content:'';position:fixed;top:-180px;right:-180px;width:450px;height:450px;background:radial-gradient(circle,rgba(201,168,76,0.08) 0%,transparent 65%);pointer-events:none;z-index:0}
-.wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:1.4rem;position:relative;z-index:1}
-.loader{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:3rem;width:100%}
-.spinner{width:38px;height:38px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+.wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:1.4rem}
+.loader{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem;width:100%}
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.avatar{width:90px;height:90px;border-radius:50%;border:2px solid var(--gold);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:700;color:var(--gold);overflow:hidden;margin-top:.5rem}
+.avatar{width:88px;height:88px;border-radius:50%;border:2px solid var(--gold);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--gold);overflow:hidden;margin-top:.5rem}
 .avatar img{width:100%;height:100%;object-fit:cover}
-.name{font-size:1.55rem;font-weight:700;letter-spacing:.02em;text-align:center}
-.bio{font-size:.9rem;color:var(--muted);text-align:center;line-height:1.65;max-width:300px}
+.pname{font-size:1.5rem;font-weight:700;text-align:center}
+.pbio{font-size:.9rem;color:var(--muted);text-align:center;line-height:1.65;max-width:300px}
 .divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
-.sec-label{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;align-self:flex-start}
+.label{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;align-self:flex-start}
 .links{width:100%;display:flex;flex-direction:column;gap:.7rem}
-.link-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;text-decoration:none;transition:border-color .25s,background .2s,transform .15s;animation:fadeUp .4s ease both}
-.link-card:hover{border-color:rgba(201,168,76,.45);transform:translateY(-2px)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.l-icon{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
-.l-info{flex:1;min-width:0}
-.l-title{font-size:.92rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.l-url{font-size:.73rem;color:var(--muted);direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.l-arrow{color:var(--gold);font-size:.85rem;opacity:.55}
-.qr-box{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
-#qr-container img{display:block;border-radius:10px;width:220px;height:220px}
-.qr-btns{display:flex;gap:.6rem;width:100%}
+.lcard{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;text-decoration:none;transition:border-color .25s,transform .15s;animation:up .4s ease both}
+.lcard:hover{border-color:rgba(201,168,76,.45);transform:translateY(-2px)}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.lic{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.ltx{flex:1;min-width:0}
+.ltitle{font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lurl{font-size:.73rem;color:var(--muted);direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.larr{color:var(--gold);opacity:.55;font-size:.85rem}
+.qbox{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.qbox img{border-radius:10px;display:block}
+.qbtns{display:flex;gap:.6rem;width:100%}
 .btn{flex:1;padding:.72rem;border-radius:11px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;border:1px solid var(--border);transition:all .2s}
-.btn-o{background:transparent;color:var(--gold)}.btn-o:hover{background:rgba(201,168,76,.08)}
-.btn-s{background:var(--gold);color:var(--bg);border-color:var(--gold)}.btn-s:hover{background:var(--gold-l)}
-.admin-link{font-size:.75rem;color:var(--muted);text-decoration:none;margin-top:.5rem;padding:.4rem .9rem;border:1px solid rgba(255,255,255,.07);border-radius:20px;transition:color .2s}
-.admin-link:hover{color:var(--gold)}
+.bto{background:transparent;color:var(--gold)}.bto:hover{background:rgba(201,168,76,.08)}
+.bts{background:var(--gold);color:var(--bg);border-color:var(--gold)}.bts:hover{background:var(--gold-l)}
+.alink{font-size:.75rem;color:var(--muted);text-decoration:none;margin-top:.5rem;padding:.4rem .9rem;border:1px solid rgba(255,255,255,.07);border-radius:20px;transition:color .2s}
+.alink:hover{color:var(--gold)}
 .empty{text-align:center;color:var(--muted);padding:2rem;font-size:.9rem}
-.err-box{text-align:center;padding:1.5rem;background:var(--bg3);border:1px solid rgba(224,80,80,.25);border-radius:16px;width:100%;line-height:1.7}
-.err-code{font-size:.78rem;direction:ltr;text-align:left;background:var(--bg4);border-radius:8px;padding:.65rem .85rem;color:#f0a0a0;margin-top:.75rem;word-break:break-all;line-height:1.7;white-space:pre-wrap}
+.errbox{text-align:center;padding:1.5rem;background:var(--bg3);border:1px solid rgba(224,80,80,.25);border-radius:16px;width:100%;line-height:1.7}
+.errcode{font-size:.78rem;direction:ltr;text-align:left;background:var(--bg4);border-radius:8px;padding:.65rem .85rem;color:#f0a0a0;margin-top:.75rem;word-break:break-all;white-space:pre-wrap}
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="loader" id="loader">
     <div class="spinner"></div>
     <span style="color:var(--muted);font-size:.85rem">جاري التحميل...</span>
   </div>
-
-  <div id="content" style="display:none;width:100%;flex-direction:column;align-items:center;gap:1.4rem">
-    <div class="avatar" id="avatarEl"><span>ي</span></div>
+  <div id="ct" style="display:none;width:100%;flex-direction:column;align-items:center;gap:1.4rem">
+    <div class="avatar" id="av"><span id="av-init">ي</span></div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;width:100%">
-      <div class="name" id="nameEl"></div>
-      <div class="bio" id="bioEl"></div>
+      <div class="pname" id="pname"></div>
+      <div class="pbio" id="pbio"></div>
     </div>
     <div class="divider"></div>
-    <span class="sec-label">روابطي</span>
-    <div class="links" id="linksEl"></div>
+    <span class="label">روابطي</span>
+    <div class="links" id="links"></div>
     <div class="divider"></div>
-    <span class="sec-label">رمز QR</span>
-    <div class="qr-box">
-      <div id="qr-container"></div>
-      <p style="font-size:.75rem;color:var(--muted);text-align:center">امسح الرمز للوصول إلى جميع الروابط</p>
-      <div class="qr-btns">
-        <button class="btn btn-o" onclick="downloadQR()">⬇ تحميل</button>
-        <button class="btn btn-s" onclick="copyAll()">⎘ نسخ</button>
+    <span class="label">رمز QR</span>
+    <div class="qbox">
+      <div id="qr"></div>
+      <p style="font-size:.75rem;color:var(--muted);text-align:center">امسح الرمز للوصول الى جميع الروابط</p>
+      <div class="qbtns">
+        <button class="btn bto" onclick="dlQR()">تحميل</button>
+        <button class="btn bts" onclick="cpLinks()">نسخ الروابط</button>
       </div>
     </div>
-    <a href="admin.html" class="admin-link">⚙ لوحة التحكم</a>
+    <a href="admin.html" class="alink">لوحة التحكم</a>
   </div>
-
 </div>
 <script>
-// ============================================================
-// 🔥 ضع رابط قاعدة بياناتك هنا (من Firebase Console)
-// الرابط يظهر في: Realtime Database > أعلى الصفحة
-// ============================================================
-const DB_URL = "https://qrcode-9fc2e-default-rtdb.europe-west1.firebasedatabase.app";
-// ============================================================
+var DB = "https://qrcode-9fc2e-default-rtdb.europe-west1.firebasedatabase.app";
+var allLinks = [];
 
-let allLinks = [];
-
-async function init() {
-  const loader = document.getElementById('loader');
-
-  // Timeout بعد 10 ثواني
-  const timer = setTimeout(() => {
-    loader.innerHTML = makeErr(
-      'انتهت مهلة الاتصال',
-      'تحقق من:\n1. Realtime Database تم إنشاؤه في Firebase\n2. الـ Rules: ".read": true\n3. DB_URL صحيح في الكود'
-    );
+function init() {
+  var loader = document.getElementById("loader");
+  var timer = setTimeout(function() {
+    loader.innerHTML = errHTML("انتهت مهلة الاتصال", "تاكد ان Realtime Database تم انشاؤه وان Rules تسمح بالقراءة");
   }, 10000);
 
-  try {
-    const url = DB_URL.replace(/\/$/, '') + '/siteData.json';
-    const res = await fetch(url);
-    clearTimeout(timer);
-
-    if (!res.ok) {
-      throw new Error('HTTP ' + res.status + ': ' + res.statusText + '\nURL: ' + url);
-    }
-
-    const data = await res.json();
-
-    if (data === null) {
-      // قاعدة البيانات فارغة — اعرض الصفحة بدون بيانات
-      render({ profile: {}, links: [] });
-      return;
-    }
-
-    render(data);
-
-  } catch (e) {
-    clearTimeout(timer);
-    loader.innerHTML = makeErr('خطأ في الاتصال', e.message + '\n\nتأكد أن DB_URL صحيح وأن Rules تسمح بالقراءة');
-  }
+  fetch(DB + "/siteData.json")
+    .then(function(res) {
+      clearTimeout(timer);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function(data) {
+      render(data || {});
+    })
+    .catch(function(e) {
+      clearTimeout(timer);
+      loader.innerHTML = errHTML("خطا في الاتصال", e.message);
+    });
 }
 
 function render(data) {
-  const profile = data.profile || {};
-  const links = (data.links || []).filter(l => l && l.active !== false);
+  var profile = data.profile || {};
+  var links = (data.links || []).filter(function(l) { return l && l.active !== false; });
   allLinks = links;
 
-  document.getElementById('loader').style.display = 'none';
-  const ct = document.getElementById('content');
-  ct.style.display = 'flex';
+  document.getElementById("loader").style.display = "none";
+  var ct = document.getElementById("ct");
+  ct.style.display = "flex";
 
-  const nm = profile.name || 'يوسف';
-  document.getElementById('nameEl').textContent = nm;
-  document.getElementById('bioEl').textContent = profile.bio || '';
+  var nm = profile.name || "شاي قمرا";
+  document.getElementById("pname").textContent = nm;
+  document.getElementById("pbio").textContent = profile.bio || "";
 
-  const av = document.getElementById('avatarEl');
+  var av = document.getElementById("av");
   if (profile.avatar) {
-    const img = document.createElement('img');
+    var img = new Image();
     img.src = profile.avatar;
-    img.onerror = () => { av.innerHTML = '<span>' + nm[0] + '</span>'; };
-    av.innerHTML = '';
+    img.style.cssText = "width:100%;height:100%;object-fit:cover";
+    img.onerror = function() { av.innerHTML = "<span>" + nm[0] + "</span>"; };
+    av.innerHTML = "";
     av.appendChild(img);
   } else {
-    av.innerHTML = '<span>' + nm[0] + '</span>';
+    av.innerHTML = "<span>" + nm[0] + "</span>";
   }
 
-  const linksEl = document.getElementById('linksEl');
+  var linksEl = document.getElementById("links");
   if (!links.length) {
-    linksEl.innerHTML = '<div class="empty">لا توجد روابط — أضفها من لوحة التحكم</div>';
+    linksEl.innerHTML = "<div class='empty'>لا توجد روابط</div>";
   } else {
-    linksEl.innerHTML = links.map((l, i) =>
-      '<a class="link-card" href="' + l.url + '" target="_blank" rel="noopener" style="animation-delay:' + (i * 0.07) + 's">' +
-      '<div class="l-icon">' + (l.icon || '🔗') + '</div>' +
-      '<div class="l-info">' +
-        '<div class="l-title">' + l.title + '</div>' +
-        '<div class="l-url">' + l.url.replace(/^https?:\/\//, '') + '</div>' +
-      '</div>' +
-      '<span class="l-arrow">←</span>' +
-      '</a>'
-    ).join('');
+    var html = "";
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      var delay = i * 0.07;
+      var cleanUrl = l.url.replace(/^https?:\/\//, "");
+      html += "<a class='lcard' href='" + l.url + "' target='_blank' style='animation-delay:" + delay + "s'>";
+      html += "<div class='lic'>" + (l.icon || "🔗") + "</div>";
+      html += "<div class='ltx'><div class='ltitle'>" + l.title + "</div>";
+      html += "<div class='lurl'>" + cleanUrl + "</div></div>";
+      html += "<span class='larr'>&larr;</span></a>";
+    }
+    linksEl.innerHTML = html;
   }
 
-  if (links.length) {
-    const el = document.getElementById('qr-container');
-    const urls = links.map(l => l.url).join(' ');
-    const qrUrl = 'https://chart.googleapis.com/chart?chs=220x220&cht=qr&choe=UTF-8&chl=' + encodeURIComponent(urls);
-    el.innerHTML = '<img src="' + qrUrl + '" width="220" height="220" alt="QR Code">';
-  }
+  buildQR(links);
 }
 
-function downloadQR() {
-  const img = document.querySelector('#qr-container img');
+function buildQR(links) {
+  var el = document.getElementById("qr");
+  el.innerHTML = "";
+  if (!links.length) return;
+  var text = links.map(function(l) { return l.url; }).join("\n");
+  var src = "https://chart.googleapis.com/chart?chs=220x220&cht=qr&choe=UTF-8&chl=" + encodeURIComponent(text);
+  var img = new Image();
+  img.src = src;
+  img.width = 220;
+  img.height = 220;
+  img.alt = "QR";
+  img.style.cssText = "border-radius:10px;display:block";
+  el.appendChild(img);
+}
+
+function dlQR() {
+  var img = document.querySelector("#qr img");
   if (!img) return;
-  const a = document.createElement('a');
-  a.download = 'qr.png'; a.href = img.src; a.click();
+  var a = document.createElement("a");
+  a.download = "qr.png";
+  a.href = img.src;
+  a.click();
 }
 
-function copyAll() {
-  const text = allLinks.map(l => (l.icon || '') + ' ' + l.title + ': ' + l.url).join('\n');
+function cpLinks() {
+  var text = allLinks.map(function(l) { return l.title + ": " + l.url; }).join("\n");
   navigator.clipboard.writeText(text);
 }
 
-function makeErr(title, detail) {
-  return '<div class="err-box">' +
-    '<div style="font-size:1.8rem;margin-bottom:.5rem">⚠</div>' +
-    '<p style="font-size:.95rem;font-weight:500;margin-bottom:.4rem">' + title + '</p>' +
-    '<div class="err-code">' + detail + '</div>' +
-    '<a href="https://console.firebase.google.com/project/qrcode-9fc2e/database" target="_blank" ' +
-    'style="display:inline-block;margin-top:1rem;color:var(--gold);font-size:.82rem;' +
-    'border:1px solid var(--border);border-radius:20px;padding:.4rem 1rem;text-decoration:none">' +
-    'فتح Firebase Console ↗</a>' +
-    '</div>';
+function errHTML(title, detail) {
+  return "<div class='errbox'>" +
+    "<div style='font-size:1.8rem;margin-bottom:.5rem'>!</div>" +
+    "<p style='font-size:.95rem;font-weight:500;margin-bottom:.4rem'>" + title + "</p>" +
+    "<div class='errcode'>" + detail + "</div>" +
+    "<a href='https://console.firebase.google.com/project/qrcode-9fc2e/database' target='_blank' " +
+    "style='display:inline-block;margin-top:1rem;color:var(--gold);font-size:.82rem;" +
+    "border:1px solid var(--border);border-radius:20px;padding:.4rem 1rem;text-decoration:none'>" +
+    "فتح Firebase Console</a></div>";
 }
 
 init();
