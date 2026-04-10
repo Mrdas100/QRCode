@@ -40,6 +40,7 @@ body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min
 .errbox{text-align:center;padding:1.5rem;background:var(--bg3);border:1px solid rgba(224,80,80,.25);border-radius:16px;width:100%;line-height:1.7}
 .errcode{font-size:.78rem;direction:ltr;text-align:left;background:var(--bg4);border-radius:8px;padding:.65rem .85rem;color:#f0a0a0;margin-top:.75rem;word-break:break-all;white-space:pre-wrap}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -144,23 +145,24 @@ function buildQR(links) {
   var el = document.getElementById("qr");
   el.innerHTML = "";
   if (!links.length) return;
-  var text = links.map(function(l) { return l.url; }).join("\n");
-  var src = "https://chart.googleapis.com/chart?chs=220x220&cht=qr&choe=UTF-8&chl=" + encodeURIComponent(text);
-  var img = new Image();
-  img.src = src;
-  img.width = 220;
-  img.height = 220;
-  img.alt = "QR";
-  img.style.cssText = "border-radius:10px;display:block";
-  el.appendChild(img);
+  var text = links.map(function(l) { return l.url; }).join(" ");
+  var canvas = document.createElement("canvas");
+  canvas.style.cssText = "border-radius:10px;display:block";
+  el.appendChild(canvas);
+  QRCode.toCanvas(canvas, text, {
+    width: 220, margin: 2,
+    color: { dark: "#000000", light: "#ffffff" }
+  }, function(err) {
+    if (err) el.innerHTML = "<p style='color:var(--muted);font-size:.8rem'>تعذر توليد QR: " + err + "</p>";
+  });
 }
 
 function dlQR() {
-  var img = document.querySelector("#qr img");
-  if (!img) return;
+  var canvas = document.querySelector("#qr canvas");
+  if (!canvas) return;
   var a = document.createElement("a");
   a.download = "qr.png";
-  a.href = img.src;
+  a.href = canvas.toDataURL("image/png");
   a.click();
 }
 
