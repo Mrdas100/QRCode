@@ -162,13 +162,18 @@ function render(data) {
   }
 
   if (links.length) {
-    const text = '━ ' + nm + ' ━\n\n' +
-      links.map(l => (l.icon || '') + ' ' + l.title + ': ' + l.url).join('\n');
-    new QRCode(document.getElementById('qr-container'), {
-      text, width: 220, height: 220,
-      colorDark: '#0D0D0D', colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
+    const el = document.getElementById('qr-container');
+    el.innerHTML = '';
+    const urls = links.map(l => l.title + ': ' + l.url).join('
+');
+    try {
+      new QRCode(el, {
+        text: urls,
+        width: 220, height: 220,
+        colorDark: '#0D0D0D', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    } catch(e) { console.error('QR error:', e); }
   }
 }
 
