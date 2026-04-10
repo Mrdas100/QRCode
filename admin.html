@@ -361,14 +361,14 @@ const firebaseConfig = {
   appId: "1:783019589227:web:b4110ffe0e88227d213b2e"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+const fbAuth = firebase.auth();
 
 let currentLinks = [];
 let currentProfile = {};
 let idToken = null;
 
 // ── AUTH ──
-auth.onAuthStateChanged(async user => {
+fbAuth.onAuthStateChanged(async user => {
   if(user){
     idToken = await user.getIdToken();
     document.getElementById('loginScreen').style.display = 'none';
@@ -392,7 +392,7 @@ async function doLogin(){
   err.style.display = 'none';
   btn.disabled = true; btn.textContent = 'جاري الدخول...';
   try{
-    await auth.signInWithEmailAndPassword(email, pass);
+    await fbAuth.signInWithEmailAndPassword(email, pass);
   } catch(e){
     const msgs = {
       'auth/wrong-password':'كلمة المرور غير صحيحة',
@@ -406,7 +406,7 @@ async function doLogin(){
   }
 }
 document.getElementById('passInp').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-async function doLogout(){ await auth.signOut(); }
+async function doLogout(){ await fbAuth.signOut(); }
 
 // ── REST HELPERS ──
 async function dbGet(path){
@@ -416,7 +416,7 @@ async function dbGet(path){
 }
 async function dbSet(path, data){
   // Refresh token before write
-  idToken = await auth.currentUser.getIdToken(true);
+  idToken = await fbAuth.currentUser.getIdToken(true);
   const res = await fetch(DB + path + '.json?auth=' + idToken, {
     method:'PUT',
     headers:{'Content-Type':'application/json'},
@@ -468,9 +468,15 @@ function previewAvatar(){
   const url = document.getElementById('avatarUrl').value.trim();
   const name = document.getElementById('profileName').value || 'ي';
   const pv = document.getElementById('avPreview');
-  pv.innerHTML = url
-    ? '<img src="'+url+'" onerror="this.parentElement.innerHTML='<span>'+name[0]+'</span>'">'
-    : '<span>'+name[0]+'</span>';
+  if(url){
+    const img = document.createElement('img');
+    img.src = url;
+    img.onerror = function(){ pv.innerHTML = '<span>'+name[0]+'</span>'; };
+    pv.innerHTML = '';
+    pv.appendChild(img);
+  } else {
+    pv.innerHTML = '<span>'+name[0]+'</span>';
+  }
 }
 
 function renderLinksEditor(){
@@ -546,10 +552,8 @@ function buildAdminQR(){
       '<span style="font-size:.8rem;color:var(--muted);text-align:center;padding:0 1rem">أضف روابط من<br>"إدارة الروابط" أولاً</span></div>';
     return;
   }
-  const text = '━ '+(currentProfile.name||'')+' ━
-
-'+active.map(l=>(l.icon||'')+' '+l.title+': '+l.url).join('
-');
+  const lines = active.map(l=>(l.icon||'')+' '+l.title+': '+l.url).join('\n');
+  const text = '━ '+(currentProfile.name||'')+' ━\n\n'+lines;
   new QRCode(el,{text,width:220,height:220,colorDark:'#0D0D0D',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 }
 function refreshQR(){ buildAdminQR(); toast('تم تحديث رمز QR ✓'); }
