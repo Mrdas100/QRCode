@@ -353,30 +353,24 @@ body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min
 <div class="save-bar" id="saveBar"></div>
 
 <script>
-// ============================
-// 🔥 ضع إعدادات Firebase هنا
-// ============================
+const DB = "https://qrcode-9fc2e-default-rtdb.europe-west1.firebasedatabase.app";
 const firebaseConfig = {
   apiKey: "AIzaSyDqRAWvemQQH8HjdeHn8fiJot0nK8_HJzI",
   authDomain: "qrcode-9fc2e.firebaseapp.com",
-databaseURL: "https://qrcode-9fc2e-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "qrcode-9fc2e",
-  storageBucket: "qrcode-9fc2e.firebasestorage.app",
-  messagingSenderId: "783019589227",
-  appId: "1:783019589227:web:b4110ffe0e88227d213b2e",
-  measurementId: "G-F62Z7HRG4S"
+  appId: "1:783019589227:web:b4110ffe0e88227d213b2e"
 };
-
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 const auth = firebase.auth();
 
 let currentLinks = [];
 let currentProfile = {};
+let idToken = null;
 
 // ── AUTH ──
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged(async user => {
   if(user){
+    idToken = await user.getIdToken();
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'flex';
     document.getElementById('uEmail').textContent = user.email;
@@ -384,6 +378,7 @@ auth.onAuthStateChanged(user => {
     document.getElementById('sideEmail').textContent = user.email;
     loadAll();
   } else {
+    idToken = null;
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
   }
@@ -399,46 +394,67 @@ async function doLogin(){
   try{
     await auth.signInWithEmailAndPassword(email, pass);
   } catch(e){
-    err.textContent = e.code === 'auth/wrong-password' ? 'كلمة المرور غير صحيحة'
-      : e.code === 'auth/user-not-found' ? 'البريد الإلكتروني غير موجود'
-      : e.code === 'auth/invalid-email' ? 'البريد الإلكتروني غير صالح'
-      : 'خطأ: ' + e.message;
+    const msgs = {
+      'auth/wrong-password':'كلمة المرور غير صحيحة',
+      'auth/user-not-found':'البريد الإلكتروني غير موجود',
+      'auth/invalid-email':'البريد الإلكتروني غير صالح',
+      'auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة'
+    };
+    err.textContent = msgs[e.code] || ('خطأ: ' + e.message);
     err.style.display = 'block';
     btn.disabled = false; btn.textContent = 'دخول';
   }
 }
-
 document.getElementById('passInp').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+async function doLogout(){ await auth.signOut(); }
 
-async function doLogout(){
-  await auth.signOut();
+// ── REST HELPERS ──
+async function dbGet(path){
+  const res = await fetch(DB + path + '.json?auth=' + idToken);
+  if(!res.ok) throw new Error('GET ' + path + ' -> ' + res.status);
+  return res.json();
+}
+async function dbSet(path, data){
+  // Refresh token before write
+  idToken = await auth.currentUser.getIdToken(true);
+  const res = await fetch(DB + path + '.json?auth=' + idToken, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  if(!res.ok){
+    const body = await res.text();
+    throw new Error('PUT ' + path + ' -> ' + res.status + ': ' + body);
+  }
+  return res.json();
 }
 
 // ── DATA ──
 async function loadAll(){
-  const snap = await db.ref('siteData').get();
-  const data = snap.val() || {};
-  currentProfile = data.profile || {};
-  currentLinks = data.links || [];
-  renderOverview();
-  renderProfileForm();
-  renderLinksEditor();
-  buildAdminQR();
+  try{
+    const data = await dbGet('/siteData') || {};
+    currentProfile = data.profile || {};
+    currentLinks = data.links || [];
+    renderOverview();
+    renderProfileForm();
+    renderLinksEditor();
+    buildAdminQR();
+  } catch(e){
+    toast('خطأ في التحميل: ' + e.message);
+  }
 }
 
 function renderOverview(){
   const active = currentLinks.filter(l=>l&&l.active!==false);
   document.getElementById('stat-links').textContent = active.length;
   document.getElementById('stat-name').textContent = currentProfile.name || '—';
-  const ul = document.getElementById('ov-links-list');
-  ul.innerHTML = currentLinks.map(l=>`
-    <div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--border2)">
-      <span style="font-size:1.1rem">${l.icon||'🔗'}</span>
-      <span style="font-size:.85rem;flex:1">${l.title}</span>
-      <span style="font-size:.75rem;color:${l.active===false?'var(--red)':'var(--green)'}">
-        ${l.active===false?'مخفي':'نشط'}
-      </span>
-    </div>`).join('');
+  document.getElementById('ov-links-list').innerHTML = currentLinks.map(l=>
+    '<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--border2)">'+
+    '<span style="font-size:1.1rem">'+(l.icon||'🔗')+'</span>'+
+    '<span style="font-size:.85rem;flex:1">'+l.title+'</span>'+
+    '<span style="font-size:.75rem;color:'+(l.active===false?'var(--red)':'var(--green)')+'">'+
+    (l.active===false?'مخفي':'نشط')+'</span></div>'
+  ).join('');
 }
 
 function renderProfileForm(){
@@ -452,12 +468,9 @@ function previewAvatar(){
   const url = document.getElementById('avatarUrl').value.trim();
   const name = document.getElementById('profileName').value || 'ي';
   const pv = document.getElementById('avPreview');
-  const init = document.getElementById('avInitial');
-  if(url){
-    pv.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='<span>${name[0]}</span>'">`;
-  } else {
-    pv.innerHTML = `<span>${name[0]}</span>`;
-  }
+  pv.innerHTML = url
+    ? '<img src="'+url+'" onerror="this.parentElement.innerHTML='<span>'+name[0]+'</span>'">'
+    : '<span>'+name[0]+'</span>';
 }
 
 function renderLinksEditor(){
@@ -467,34 +480,28 @@ function renderLinksEditor(){
     const row = document.createElement('div');
     row.className = 'link-row';
     const isOn = l.active !== false;
-    row.innerHTML = `
-      <input class="inp icon-inp" value="${l.icon||'🔗'}" id="ic_${i}" placeholder="🔗" title="الأيقونة">
-      <input class="inp title-inp" value="${l.title||''}" id="ti_${i}" placeholder="الاسم">
-      <input class="inp url-inp" value="${l.url||''}" id="ur_${i}" placeholder="https://...">
-      <button class="toggle ${isOn?'on':'off'}" id="tg_${i}" onclick="toggleLink(${i})" title="${isOn?'إخفاء':'إظهار'}"></button>
-      <button class="btn-icon del" onclick="removeLink(${i})" title="حذف">✕</button>`;
+    row.innerHTML =
+      '<input class="inp icon-inp" value="'+(l.icon||'🔗')+'" id="ic_'+i+'" placeholder="🔗">'+
+      '<input class="inp title-inp" value="'+(l.title||'')+'" id="ti_'+i+'" placeholder="الاسم">'+
+      '<input class="inp url-inp" value="'+(l.url||'')+'" id="ur_'+i+'" placeholder="https://...">'+
+      '<button class="toggle '+(isOn?'on':'off')+'" id="tg_'+i+'" onclick="toggleLink('+i+')"></button>'+
+      '<button class="btn-icon del" onclick="removeLink('+i+')" title="حذف">✕</button>';
     el.appendChild(row);
-    ['ic','ti','ur'].forEach(p=>{
-      document.getElementById(`${p}_${i}`).addEventListener('input', e=>{
-        const key = p==='ic'?'icon':p==='ti'?'title':'url';
-        currentLinks[i][key] = e.target.value;
-      });
+    [{p:'ic',k:'icon'},{p:'ti',k:'title'},{p:'ur',k:'url'}].forEach(({p,k})=>{
+      document.getElementById(p+'_'+i).addEventListener('input', e=>{ currentLinks[i][k] = e.target.value; });
     });
   });
 }
 
 function toggleLink(i){
-  currentLinks[i].active = currentLinks[i].active === false ? true : false;
-  const btn = document.getElementById('tg_'+i);
-  btn.className = 'toggle ' + (currentLinks[i].active ? 'on' : 'off');
+  currentLinks[i].active = currentLinks[i].active === false;
+  document.getElementById('tg_'+i).className = 'toggle '+(currentLinks[i].active?'on':'off');
 }
-
 function addNewLink(){
   currentLinks.push({icon:'🔗', title:'رابط جديد', url:'https://', active:true});
   renderLinksEditor();
   document.getElementById('linksEditor').lastElementChild.querySelector('.title-inp').focus();
 }
-
 function removeLink(i){
   if(!confirm('حذف هذا الرابط؟')) return;
   currentLinks.splice(i,1);
@@ -502,20 +509,30 @@ function removeLink(i){
 }
 
 async function saveProfile(){
-  const name = document.getElementById('profileName').value.trim();
-  const bio = document.getElementById('profileBio').value.trim();
-  const avatar = document.getElementById('avatarUrl').value.trim();
-  currentProfile = {name, bio, avatar};
-  await db.ref('siteData/profile').set(currentProfile);
-  renderOverview();
-  toast('تم حفظ الملف الشخصي ✓');
+  const btn = event.target;
+  btn.textContent = 'جاري الحفظ...'; btn.disabled = true;
+  try{
+    currentProfile = {
+      name: document.getElementById('profileName').value.trim(),
+      bio: document.getElementById('profileBio').value.trim(),
+      avatar: document.getElementById('avatarUrl').value.trim()
+    };
+    await dbSet('/siteData/profile', currentProfile);
+    renderOverview();
+    toast('تم حفظ الملف الشخصي ✓');
+  } catch(e){ toast('خطأ: ' + e.message); }
+  btn.textContent = '✓ حفظ الملف الشخصي'; btn.disabled = false;
 }
 
 async function saveLinks(){
-  await db.ref('siteData/links').set(currentLinks);
-  renderOverview();
-  buildAdminQR();
-  toast('تم حفظ الروابط ✓');
+  const btn = event.target;
+  btn.textContent = 'جاري الحفظ...'; btn.disabled = true;
+  try{
+    await dbSet('/siteData/links', currentLinks);
+    renderOverview(); buildAdminQR();
+    toast('تم حفظ الروابط ✓');
+  } catch(e){ toast('خطأ: ' + e.message); }
+  btn.textContent = '✓ حفظ جميع الروابط'; btn.disabled = false;
 }
 
 // ── QR ──
@@ -523,16 +540,18 @@ function buildAdminQR(){
   const el = document.getElementById('adminQR');
   el.innerHTML = '';
   const active = currentLinks.filter(l=>l&&l.active!==false);
-  const text = `━ ${currentProfile.name||''} ━\n\n` + active.map(l=>`${l.icon||''} ${l.title}: ${l.url}`).join('\n');
-  new QRCode(el, {text, width:220, height:220, colorDark:'#0D0D0D', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
+  if(!active.length) return;
+  const text = '━ '+(currentProfile.name||'')+' ━
+
+'+active.map(l=>(l.icon||'')+' '+l.title+': '+l.url).join('
+');
+  new QRCode(el,{text,width:220,height:220,colorDark:'#0D0D0D',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 }
-
 function refreshQR(){ buildAdminQR(); toast('تم تحديث رمز QR ✓'); }
-
 function downloadAdminQR(){
   const c = document.querySelector('#adminQR canvas');
-  if(!c){ toast('لا يوجد رمز للتحميل'); return; }
-  const a = document.createElement('a'); a.download='qr.png'; a.href=c.toDataURL(); a.click();
+  if(!c){toast('لا يوجد رمز');return;}
+  const a=document.createElement('a');a.download='qr.png';a.href=c.toDataURL();a.click();
 }
 
 // ── UI ──
@@ -542,11 +561,10 @@ function switchTab(btn){
   btn.classList.add('active');
   document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
 }
-
 function toast(msg){
-  const bar = document.getElementById('saveBar');
-  bar.textContent = msg; bar.classList.add('show');
-  setTimeout(()=>bar.classList.remove('show'), 2500);
+  const bar=document.getElementById('saveBar');
+  bar.textContent=msg; bar.classList.add('show');
+  setTimeout(()=>bar.classList.remove('show'),2800);
 }
 </script>
 </body>
